@@ -1,8 +1,9 @@
-import {strict as assert} from "assert";
+#!/usr/bin/env mocha -R spec
 
+import {strict as assert} from "assert";
 import {$$, $$$} from "../";
 
-const TITLE = __filename.split("/").pop() as string;
+const TITLE = __filename.split("/").pop()!;
 
 describe(TITLE, () => {
     it("$$`[${...}]`", () => {
