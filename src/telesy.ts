@@ -2,6 +2,8 @@
  * Telesy
  */
 
+import type {Telesy} from "../";
+
 type EscapeFn = (str: string) => string;
 
 const AMP = {"<": "&lt;", "&": "&amp;", ">": "&gt;", '"': "&quot;", "'": "&apos;"};

@@ -1,6 +1,7 @@
 **/*.js
 *.js.map
 *.swp
+*.tgz
 *~
 .DS_Store
 .Thumbs

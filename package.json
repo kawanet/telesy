@@ -27,11 +27,18 @@
     "src/*.js",
     "types/*.d.ts"
   ],
+  "homepage": "https://github.com/kawanet/telesy#readme",
   "license": "MIT",
+  "main": "./src/telesy.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kawanet/telesy.git"
+  },
   "scripts": {
     "build": "./node_modules/.bin/tsc -p .",
     "fixpack": "fixpack",
     "prepack": "npm run build && npm test",
     "test": "./node_modules/.bin/mocha tests/*.js"
-  }
+  },
+  "types": "types/telesy.d.ts"
 }

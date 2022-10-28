@@ -1,6 +1,7 @@
 import {strict as assert} from "assert";
 
-import * as telesy from "../src/telesy";
+import * as telesy from "../";
+import type {Telesy} from "../";
 
 const TITLE = __filename.split("/").pop() as string;
 

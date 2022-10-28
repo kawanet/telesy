@@ -3,9 +3,10 @@
 [![Node.js CI](https://github.com/kawanet/telesy/workflows/Node.js%20CI/badge.svg?branch=main)](https://github.com/kawanet/telesy/actions/)
 [![npm version](https://img.shields.io/npm/v/telesy)](https://www.npmjs.com/package/telesy)
 
-- We love TypeScript. Telesy allows HTML templates the type guard safety.
+- We love TypeScript. Telesy allows HTML templates the type checking safety.
 - No compilation build phase needed. Telesy just works on any ES6 compliant [web browsers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#browser_compatibility) natively.
 - 10 times faster than `ReactDomServer.renderToString()` to generate static HTML code.
+- Lightweight. Less than 1KB when minified.
 
 ## SYNOPSIS
 
@@ -35,7 +36,7 @@ const selectRender = (ctx: Context) => $$`
 document.querySelector<HTMLElement>("#here").innerHTML = selectRender(context);
 ```
 
-JavaScript
+ES6 JavaScript
 
 ```typescript
 const {$$, $$$} = require("telesy");
@@ -123,6 +124,7 @@ render({bool: true}); // => '<span>YES</span>'
 render({bool: false}); // => '<span>NO</span>'
 ```
 
+See [telesy.d.ts](https://github.com/kawanet/telesy/blob/main/types/telesy.d.ts) for more detail.
 
 ## FRAGMENT
 
@@ -139,7 +141,7 @@ interface Fragment {
 
 ## BENCHMARKS
 
-| Library                                                   | Type Guard | Ops/Sec | Note                                      |
+| Library                                                   | Type Check | Ops/Sec | Note                                      |
 |-----------------------------------------------------------|------------|---------|-------------------------------------------|
 | **Telesy**                                                | ✅ Safe    | 42,388  | Backed by the native template literals    |
 | [React](https://www.npmjs.com/package/react-dom)          | ✅ Safe    | 4,302   | `ReactDomServer.renderToString()` is slow |

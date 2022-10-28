@@ -31,4 +31,5 @@ declare namespace Telesy {
     }
 }
 
-exports = Telesy.telesy;
+export const $$: Telesy.$$;
+export const $$$: Telesy.$$$;
