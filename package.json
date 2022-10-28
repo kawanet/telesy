@@ -3,6 +3,9 @@
   "description": "Telesy - Simple Type Safe HTML Templating Library using Template Literals",
   "version": "1.0.0",
   "author": "@kawanet",
+  "bin": {
+    "mustache2telesy": "mustache/mustache2telesy.cli.js"
+  },
   "devDependencies": {
     "@types/benchmark": "2.1.2",
     "@types/hogan.js": "3.0.1",
@@ -24,6 +27,7 @@
   "files": [
     "LICENSE",
     "README.md",
+    "mustache/*.js",
     "src/*.js",
     "types/*.d.ts"
   ],
