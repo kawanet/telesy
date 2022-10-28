@@ -1,0 +1,37 @@
+{
+  "name": "telesy",
+  "description": "Telesy - Simple Type Safe HTML Templating Library using Template Literals",
+  "version": "1.0.0",
+  "author": "@kawanet",
+  "devDependencies": {
+    "@types/benchmark": "2.1.2",
+    "@types/hogan.js": "3.0.1",
+    "@types/mocha": "10.0.0",
+    "@types/node": "16.18.0",
+    "@types/react": "18.0.24",
+    "@types/react-dom": "18.0.8",
+    "benchmark": "2.1.4",
+    "handlebars": "4.7.7",
+    "hogan.js": "3.0.2",
+    "mocha": "10.1.0",
+    "mustache": "4.2.0",
+    "mustatte": "0.1.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "terser": "5.15.1",
+    "typescript": "4.8.4"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "src/*.js",
+    "types/*.d.ts"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/tsc -p .",
+    "fixpack": "fixpack",
+    "prepack": "npm run build && npm test",
+    "test": "./node_modules/.bin/mocha tests/*.js"
+  }
+}

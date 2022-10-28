@@ -1,0 +1,14 @@
+**/*.js
+*.js.map
+*.swp
+*~
+.DS_Store
+.Thumbs
+._*
+.idea/*/*.xml
+.idea/modules.xml
+.idea/vcs.xml
+node_modules/
+package-lock.json
+tmp/
+~$*
