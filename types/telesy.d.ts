@@ -15,7 +15,7 @@ declare namespace Telesy {
         (t: TemplateStringsArray, ...args: V[]): string;
 
         // Function Call: $$($$$("<li>${v}</li>"))
-        (t: Fragment): string;
+        (t: V): string;
     }
 
     interface $$$ {
@@ -23,7 +23,7 @@ declare namespace Telesy {
         (t: TemplateStringsArray, ...args: V[]): Fragment;
 
         // Function Call: $$$("<li>${v}</li>")
-        (t: string): Fragment;
+        (t: V): Fragment;
     }
 
     interface Fragment {

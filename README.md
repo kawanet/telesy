@@ -130,7 +130,8 @@ See [telesy.d.ts](https://github.com/kawanet/telesy/blob/main/types/telesy.d.ts)
 
 - Template literal with `$$` tag returns a plain string.
 - Template literal with `$$$` tag returns an encapsulated Fragment object as below.
-- Function call `$$(fragment)` returns a plain string for the `fragment` given.
+- Function call `$$(string)` returns an HTML escaped string.
+- Function call `$$(fragment)` returns a raw string for the `fragment` given.
 - Function call `$$$(string)` returns a Fragment object for the `string` given, vice versa.
 
 ```typescript

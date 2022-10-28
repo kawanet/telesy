@@ -1,7 +1,6 @@
 import {strict as assert} from "assert";
 
 import * as telesy from "../";
-import type {Telesy} from "../";
 
 const TITLE = __filename.split("/").pop() as string;
 
@@ -47,28 +46,26 @@ describe(TITLE, () => {
 
         it("function call", () => {
             equal($$({outerHTML: "<foo>"}), "<foo>");
+            equal($$("<bar>"), "&lt;bar&gt;");
+            equal($$(0), "0");
+            equal($$(1), "1");
+            equal($$(null), "");
+            equal($$(undefined), "");
+            equal($$(false), "");
         });
 
         it("irregular usage", () => {
             // @ts-ignore
-            equal($$(0), "0");
-            // @ts-ignore
-            equal($$(1), "1");
-            // @ts-ignore
-            equal($$(null), "");
-            // @ts-ignore
-            equal($$(undefined), "");
-            // @ts-ignore
             equal($$(true), "true");
             // @ts-ignore
-            equal($$(false), "");
+            equal($$(["<quux>"]), "&lt;quux&gt;");
         });
     });
 
     describe("$$$", () => {
         const {$$$} = telesy;
 
-        const equal = (actual: Telesy.Fragment, expected: string) => {
+        const equal = (actual: ReturnType<typeof $$$>, expected: string) => {
             assert.equal(typeof actual, "object", expected);
             assert.equal(typeof (actual && actual.outerHTML), "string", expected);
             assert.equal(actual.outerHTML, expected);
@@ -107,7 +104,17 @@ describe(TITLE, () => {
         });
 
         it("function call", () => {
-            equal($$$("<foo>"), "<foo>");
+            equal($$$({outerHTML: "<foo>"}), "<foo>");
+            equal($$$("<bar>"), "<bar>");
+            equal($$$(0), "0");
+            equal($$$(1), "1");
+            equal($$$(null), "");
+            equal($$$(undefined), "");
+            equal($$$(false), "");
+            equal($$$($$$("<foo>")), "<foo>");
+            equal($$$($$$($$$("<bar>"))), "<bar>");
+            equal($$$([$$$("<buz>")]), "<buz>");
+            equal($$$([$$$([$$$("<qux>")])]), "<qux>");
         });
 
         it("stringify", () => {
@@ -119,25 +126,7 @@ describe(TITLE, () => {
 
         it("irregular usage", () => {
             // @ts-ignore
-            equal($$$(0), "0");
-            // @ts-ignore
-            equal($$$(1), "1");
-            // @ts-ignore
-            equal($$$(null), "");
-            // @ts-ignore
-            equal($$$(undefined), "");
-            // @ts-ignore
             equal($$$(true), "true");
-            // @ts-ignore
-            equal($$$(false), "");
-            // @ts-ignore
-            equal($$$($$$("<foo>")), "<foo>");
-            // @ts-ignore
-            equal($$$($$$($$$("<bar>"))), "<bar>");
-            // @ts-ignore
-            equal($$$([$$$("<buz>")]), "<buz>");
-            // @ts-ignore
-            equal($$$([$$$([$$$("<qux>")])]), "<qux>");
             // @ts-ignore
             equal($$$(["<quux>"]), "<quux>");
         });
