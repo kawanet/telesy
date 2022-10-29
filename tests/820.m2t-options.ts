@@ -56,7 +56,7 @@ describe(TITLE, () => {
         const html = `
         <span>{{ foo.bar.buz }}</span>
         {{# foo.bar }}
-        <span>{{ foo.bar.qux }}</span>
+        <span>{{ qux }}</span>
         {{/ foo.bar }}
         `;
         const normalRender = compile(mustache2telesy(html, {trim: true, guess: false}));
@@ -76,14 +76,14 @@ describe(TITLE, () => {
         }
     });
 
-    it(`{cond: "isFoo"}`, () => {
+    it(`{boolean: "isFoo"}`, () => {
         const html = `
         {{# foo.isFoo }}
         <span>Foo</span>
         {{/ foo.isFoo }}
         `;
         const normalRender = compile(mustache2telesy(html, {trim: true}));
-        const betterRender = compile(mustache2telesy(html, {trim: true, cond: "isFoo"}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, boolean: "isFoo"}));
         assert.notEqual(String(betterRender), String(normalRender));
 
         {
@@ -97,14 +97,14 @@ describe(TITLE, () => {
         }
     });
 
-    it(`{loop: "fooList"}`, () => {
+    it(`{array: "fooList"}`, () => {
         const html = `
         {{# fooList }}
         <li>{{.}}</li>
         {{/ fooList }}
         `;
         const normalRender = compile(mustache2telesy(html, {trim: true}));
-        const betterRender = compile(mustache2telesy(html, {trim: true, loop: "fooList"}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, array: "fooList"}));
         assert.notEqual(String(betterRender), String(normalRender));
 
         {

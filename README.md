@@ -158,7 +158,7 @@ interface Fragment {
 |-----------------------------------------------------------|------------|---------|-------------------------------------------|
 | **Telesy**                                                | ✅ Safe    | 42,388  | Backed by the native template literals    |
 | [React](https://www.npmjs.com/package/react-dom)          | ✅ Safe    | 4,302   | `ReactDomServer.renderToString()` is slow |
-| [Mustatte](https://www.npmjs.com/package/mustatte)        | ❌ N/A     | 82,726  | Fastest but type gauard **NOT** supported |
+| [Mustatte](https://www.npmjs.com/package/mustatte)        | ❌ N/A     | 82,726  | Fastest but type check **NOT** supported  |
 | [Hogan.js](https://www.npmjs.com/package/hogan.js)        | ❌ N/A     | 79,518  | Last publish: 8 years ago                 |
 | [Handlebars.js](https://www.npmjs.com/package/handlebars) | ❌ N/A     | 56,307  | A popular Mustache library                |
 
@@ -170,10 +170,11 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 ```sh
 ./node_modules/.bin/mustache2telesy --trim --guess templates/*.html > templates.ts
 
-./node_modules/.bin/mustache2telesy --trim --cond="isHidden,selected" --loop="items,itemList" templates/*.html > templates.ts
+./node_modules/.bin/mustache2telesy --trim --array="items,itemList" --bool="isHidden,selected" templates/*.html > templates.ts
 ```
 
-Most features of Mustache would just work on Telesy except for some use cases such as lambda function calls.
+Most of Mustache's basic features would just get transformed by `mustache2telesy`,
+except for some use cases such as lambda function calls.
 TypeScript's type checking would help you to fix them easily.
 
 ## LINKS

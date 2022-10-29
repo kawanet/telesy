@@ -20,6 +20,7 @@ function CLI(stream: { write(str: string): any }) {
     if (!args.length) {
         const cmd = process.argv[1]!.split("/").pop();
         console.error(`Usage: ${cmd} --trim --guess templates/*.html > templates.ts`);
+        console.error(`Usage: ${cmd} --trim --array="items,itemList" --bool="isHidden,selected" templates/*.html > templates.ts`);
         return;
     }
 
