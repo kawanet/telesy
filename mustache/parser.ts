@@ -68,7 +68,7 @@ class Vars {
     }
 
     match(key: string): boolean {
-        const s = key.split(".").at(-1)!;
+        const s = key.split(".").pop()!;
         return !!this.index[s] || !!this.index[key];
     }
 }
@@ -91,11 +91,11 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
     const loopVars = new Vars(option?.loop!);
 
     if (option?.trim) {
-        if (/^\s+$/.test(array.at(0)!)) {
+        if (/^\s+$/.test(array[0])) {
             array[0] = "";
         }
-        if (/^\s+$/.test(array.at(-1)!)) {
-            array[array.length - 1] = "";
+        if (/^\s+$/.test(array[array.length - 1])) {
+            array.pop();
         }
     }
 

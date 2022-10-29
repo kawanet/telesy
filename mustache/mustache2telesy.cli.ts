@@ -6,8 +6,6 @@ import {mustache2telesy} from "./parser";
 CLI(process.stdout);
 
 function CLI(stream: { write(str: string): any }) {
-    stream.write(`import {$$, $$$} from "telesy";\n\n`);
-
     // @see https://tc39.es/ecma262/#sec-keywords-and-reserved-words
     const reservedWords = `await break case catch class const continue debugger default delete do
     else enum export extends false finally for function if import in instanceof new null return
@@ -20,9 +18,12 @@ function CLI(stream: { write(str: string): any }) {
     const args = process.argv.slice(2);
 
     if (!args.length) {
-        const cmd = process.argv.at(1)!.split("/").at(-1);
+        const cmd = process.argv[1]!.split("/").pop();
         console.error(`Usage: ${cmd} --trim --guess templates/*.html > templates.ts`);
+        return;
     }
+
+    stream.write(`import {$$, $$$} from "telesy";\n\n`);
 
     const options: { [key: string]: boolean | string } = {};
 
