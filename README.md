@@ -53,6 +53,8 @@ document.querySelector("#here").innerHTML = selectRender(context);
 
 ## USAGE
 
+See [telesy.d.ts](https://github.com/kawanet/telesy/blob/main/types/telesy.d.ts) for detail.
+
 Template variables:
 
 ```js
@@ -124,7 +126,17 @@ render({bool: true}); // => '<span>YES</span>'
 render({bool: false}); // => '<span>NO</span>'
 ```
 
-See [telesy.d.ts](https://github.com/kawanet/telesy/blob/main/types/telesy.d.ts) for more detail.
+```js
+// DON'T
+const render = (ctx) => $$`<span>${ctx.bool || "it is falsy"}</span>`;
+render({bool: false}); // => '<span>it is falsy</span>'
+
+// DO
+const render = (ctx) => $$`<span>${!ctx.bool && "it is falsy"}</span>`;
+const render = (ctx) => $$`<span>${ctx.bool ? "" : "it is falsy"}</span>`;
+render({bool: true}); // => '<span></span>'
+render({bool: false}); // => '<span>it is falsy</span>'
+```
 
 ## FRAGMENT
 
