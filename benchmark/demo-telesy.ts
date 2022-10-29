@@ -1,7 +1,7 @@
 import type {Table} from "./demo-data";
 import {$$, $$$} from "../src/telesy";
 
-//language=HTML
+// language=HTML
 export const telesyRender = (ctx: Table.Context) => $$`
     <table>
         ${ctx.rows.map(row => $$$`

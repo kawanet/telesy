@@ -41,8 +41,9 @@ function CLI(stream: { write(str: string): any }) {
 
         const code = mustache2telesy(source);
 
+        // @see https://www.jetbrains.com/help/idea/using-language-injections.html#use-language-injection-comments
         if (/\.html$/.test(file)) {
-            stream.write(`//language=HTML\n`);
+            stream.write(`// language=HTML\n`);
         }
 
         stream.write(`export const ${name} = ${code};\n\n`);

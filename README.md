@@ -26,7 +26,7 @@ interface Option {
     label: string;
 }
 
-//language=HTML
+// language=HTML
 const selectRender = (ctx: Context) => $$`
     <select name="${ctx.name}">
         ${ctx.options.map(v => $$$`<option value="${v.value}" ${v.selected}>${v.label}</option>`)}
@@ -41,7 +41,7 @@ ES6 JavaScript
 ```typescript
 const {$$, $$$} = require("telesy");
 
-//language=HTML
+// language=HTML
 const selectRender = ctx => $$`
     <select name="${ctx.name}">
         ${ctx.options.map(v => $$$`<option value="${v.value}" ${v.selected}>${v.label}</option>`)}
@@ -96,7 +96,7 @@ render({src: "https://example.com/image.png", hidden: false}); // => '<div><img 
 Loop sections:
 
 ```js
-//language=HTML
+// language=HTML
 const render = (ctx) => $$`
     <table>
         ${ctx.rows.map(row => $$$`
