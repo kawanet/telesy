@@ -170,7 +170,7 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 ```sh
 ./node_modules/.bin/mustache2telesy --trim --guess templates/*.html > templates.ts
 
-./node_modules/.bin/mustache2telesy --trim --array="items,itemList" --boolean="selected,deleted" templates/*.html > templates.ts
+./node_modules/.bin/mustache2telesy --trim --cond="isHidden,selected" --loop="items,itemList" templates/*.html > templates.ts
 ```
 
 Most features of Mustache would just work on Telesy except for some use cases such as lambda function calls.

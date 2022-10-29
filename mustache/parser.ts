@@ -48,9 +48,9 @@ class Layer {
 
 declare namespace M2T {
     interface Option {
-        array?: string;
-        boolean?: string;
+        cond?: string; // {{# cond }}...{{/ cond }}
         guess?: boolean;
+        loop?: string; // {{# loop }}...{{/ loop }}
         trim?: boolean;
     }
 }
@@ -87,8 +87,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
     const regexp = "{{([^{}]*|{[^{}]*})}}";
     const array = String(source).split(new RegExp(regexp));
 
-    const boolVars = new Vars(option?.boolean!);
-    const arrayVars = new Vars(option?.array!);
+    const condVars = new Vars(option?.cond!);
+    const loopVars = new Vars(option?.loop!);
 
     if (option?.trim) {
         if (/^\s+$/.test(array.at(0)!)) {
@@ -209,7 +209,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         const current = layer.variable(str); // => v.obj?.obj?.key
 
         // Conditional Section
-        const isBoolean = boolVars.match(str);
+        const isBoolean = condVars.match(str);
         if (isBoolean) {
             layer = layer.push(str, "` }", false);
             buffer.push(`\${ !!${current} && \$\$\$\``);
@@ -222,7 +222,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         const child = layer.key;
 
         // Loop Section
-        const isArray = arrayVars.match(str);
+        const isArray = loopVars.match(str);
         if (isArray) {
             buffer.push(`\${ ${current}?.map(${child} => \$\$\$\``);
             return;
@@ -273,15 +273,15 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         if (name === ".") return;
 
         if (/\.length$/.test(name)) {
-            boolVars.add(name);
+            condVars.add(name);
             name = name.replace(/\.[^.]+$/, "");
-            arrayVars.add(name)
+            loopVars.add(name)
         }
 
         while (/\./.test(name)) {
             name = name.replace(/\.[^.]+$/, "");
             if (/\.\d+$/.test(name)) break;
-            boolVars.add(name);
+            condVars.add(name);
         }
     }
 }
