@@ -60,23 +60,6 @@ export function mustache2telesy(source: string): string {
     const regexp = "{{([^{}]*|{[^{}]*})}}";
     const array = String(source).split(new RegExp(regexp));
 
-    const STANDALONE = {"/": 1, "!": 1, "^": 1, ">": 1, "#": 1} as { [chr: string]: number };
-    const last = array.length;
-
-    for (let i = last - 2; i > 0; i -= 2) {
-        const left = array[i - 1];
-        const right = array[i + 1];
-
-        const standalone = STANDALONE[array[i][0]] &&
-            (i === 1 ? left.search(/(^|\n)[ \t]*$/) > -1 : left.search(/\n[ \t]*$/) > -1) &&
-            (i === last - 2 ? right.search(/^[ \t]*(\r?\n|$)/) > -1 : right.search(/^[ \t]*\r?\n/) > -1);
-
-        if (standalone) {
-            array[i - 1] = left.replace(/[ \t]*$/, "");
-            array[i + 1] = right.replace(/^[ \t]*\r?\n?/, "");
-        }
-    }
-
     let layer = new Layer("`");
     const buffer: string[] = ["(" + layer.key + ") => $$`"];
 
