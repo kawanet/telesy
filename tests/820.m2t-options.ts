@@ -27,7 +27,7 @@ describe(TITLE, () => {
         assert.equal(removeSpaces(trimedResult), removeSpaces(normalResult));
     });
 
-    it(`{guess: true}`, () => {
+    it(`{guess: true} (Array)`, () => {
         const html = `
         {{# array.length }}
         <ul>
@@ -48,6 +48,30 @@ describe(TITLE, () => {
 
         {
             const data = {array: [1, 2, 3]};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+    });
+
+    it(`{guess: true} (Object)`, () => {
+        const html = `
+        <span>{{ foo.bar.buz }}</span>
+        {{# foo.bar }}
+        <span>{{ foo.bar.qux }}</span>
+        {{/ foo.bar }}
+        `;
+        const normalRender = compile(mustache2telesy(html, {trim: true, guess: false}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, guess: true}));
+        // console.warn(String(betterRender));
+        // console.warn(String(normalRender));
+        assert.notEqual(String(betterRender), String(normalRender));
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+
+        {
+            const data = {foo: {bar: {buz: "BUZ", qux: "QUX"}}};
             assert.equal(normalRender(data), betterRender(data));
         }
     });
