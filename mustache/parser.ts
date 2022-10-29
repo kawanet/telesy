@@ -97,19 +97,19 @@ export function mustache2telesy(source: string): string {
 
     // !boolean && $$$`${variable}`
     // !boolean && variable
-    result = result.replace(/ && \$\$\$`\$\{([^\s`]+)}`/g, " && $1");
+    result = result.replace(/ && \$\$\$`\$\{([^$`]+|[^{`]+|[^}`]+)}`/g, " && $1");
 
     // .map(v => $$$`${variable}`)
     // .map(v => $$$(variable))
-    result = result.replace(/ => \$\$\$`\$\{([^\s`]+)}`/g, " => $$$$$$($1)");
+    result = result.replace(/ => \$\$\$`\$\{([^$`]+|[^{`]+|[^}`]+)}`/g, " => $$$$$$($1)");
 
-    // !boolean && $$$`text`)
+    // !boolean && $$$`text`
     // !boolean && `text`
     result = result.replace(/ && \$\$\$(`[^`${}<>&"']*`)/g, " && $1");
 
     // .map(v => $$$`text`)
-    // .map(v => `text`)
-    result = result.replace(/\(\w => \$\$\$(`[^`${}<>&"']*`)\)/g, "(() => $1)");
+    // .map(() => $$$`text`)
+    result = result.replace(/\(\w => (\$\$\$`([^$`]+|[^{`]+|[^}`]+)?`)\)/g, "(() => $1)");
 
     return result;
 
