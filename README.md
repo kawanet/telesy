@@ -1,10 +1,10 @@
-# Telesy - Simple Type Safe HTML Templating Library using Template Literals
+# Telesy - Type Safe HTML Templating Library using Template Literals
 
 [![Node.js CI](https://github.com/kawanet/telesy/workflows/Node.js%20CI/badge.svg?branch=main)](https://github.com/kawanet/telesy/actions/)
 [![npm version](https://img.shields.io/npm/v/telesy)](https://www.npmjs.com/package/telesy)
 
-- We love TypeScript. Telesy allows HTML templates the type checking safety.
-- No compilation build phase needed. Telesy just works on any ES6 compliant [web browsers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#browser_compatibility) natively.
+- We love TypeScript. Telesy gives the type safe for HTML templates.
+- No compilation build phase needed. Telesy just works natively on any ES6 compliant [web browsers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#browser_compatibility) and Node.js.
 - 10 times faster than `ReactDomServer.renderToString()` to generate static HTML code.
 - Lightweight. Less than 1KB when minified. No additional dependencies.
 
@@ -36,9 +36,9 @@ const selectRender = (ctx: Context) => $$`
 document.querySelector<HTMLElement>("#here").innerHTML = selectRender(context);
 ```
 
-ES6 JavaScript
+JavaScript (ES6)
 
-```typescript
+```js
 const {$$, $$$} = require("telesy");
 
 // language=HTML
@@ -71,7 +71,7 @@ const render = (ctx) => $$`<p>${ctx.html}</p>`;
 render({html: 'first line<br>second line'}); // => '<p>first line＆lt;br＆gt;second line</p>'
 ```
 
-HTML unescaped with `$$$` like `dangerouslySetInnerHTML` does:
+HTML elements unescaped with `$$$` filter function like `dangerouslySetInnerHTML` does:
 
 ```js
 const render = (ctx) => $$`<p>${$$$(ctx.html)}</p>`;
@@ -79,7 +79,7 @@ const render = (ctx) => $$`<p>${$$$(ctx.html)}</p>`;
 render({html: 'first line<br>second line'}) // => '<p>first line<br>second line</p>'
 ```
 
-Conditional section for string:
+Conditional section for plain string:
 
 ```js
 const render = (ctx) => $$`<div class="${(ctx.value >= 10) && 'is-many'}">${ctx.value}</div>`;
@@ -87,15 +87,15 @@ const render = (ctx) => $$`<div class="${(ctx.value >= 10) && 'is-many'}">${ctx.
 render({value: 10}); // => '<div class="is-many">10</div>'
 ```
 
-Conditional section for HTML elements:
+Conditional section with `$$$` tag template literals for HTML elements:
 
 ```js
 const render = (ctx) => $$`<div>${!ctx.hidden && $$$`<img src="${ctx.src}">`}</div>`;
 
-render({src: "https://example.com/image.png", hidden: false}); // => '<div><img src="https://example.com/image.png"></div>'
+render({src: "image.png", hidden: false}); // => '<div><img src="image.png"></div>'
 ```
 
-Loop sections:
+Loop sections with nested `$$$` tag template literals:
 
 ```js
 // language=HTML
@@ -112,13 +112,31 @@ const render = (ctx) => $$`
 `;
 ```
 
-Note that `null`, `undefined` and `false` values are just ignored to enable the sections feature described above.
-The boolean values are not allowed within the template literals, then. Specify strings to output explicitly, instead.
+## FRAGMENT
+
+- Template literal with `$$` tag returns a plain string.
+- Template literal with `$$$` tag returns an encapsulated `Fragment` object as below.
+- Function call `$$(string)` returns an HTML escaped string.
+- Function call `$$(fragment)` returns a raw string for the `Fragment` object given.
+- Function call `$$$(string)` returns a `Fragment` object for the `string` given, vice versa.
+
+```typescript
+interface Fragment {
+    outerHTML: string;
+}
+```
+
+## EMPTY VALUES
+
+Telesy accepts `string`, `number` values and `Fragment`s within the template literals.
+It outputs empty string `""` when `null`, `undefined` and `false` values given.
+Note that it doesn't accept `true` values, on the other hand.
+Specify strings to output explicitly, instead.
 
 ```js
 // DON'T
 const render = (ctx) => $$`<span>${ctx.bool}</span>`;
-render({bool: false}); // => '<span></span>' (the false value is ignored)
+render({bool: false}); // => '<span></span>' (the false value cause an empty string)
 
 // DO
 const render = (ctx) => $$`<span>${ctx.bool ? "YES" : "NO"}</span>`;
@@ -138,23 +156,11 @@ render({bool: true}); // => '<span></span>'
 render({bool: false}); // => '<span>it is falsy</span>'
 ```
 
-## FRAGMENT
-
-- Template literal with `$$` tag returns a plain string.
-- Template literal with `$$$` tag returns an encapsulated Fragment object as below.
-- Function call `$$(string)` returns an HTML escaped string.
-- Function call `$$(fragment)` returns a raw string for the `fragment` given.
-- Function call `$$$(string)` returns a Fragment object for the `string` given, vice versa.
-
-```typescript
-interface Fragment {
-    outerHTML: string;
-}
-```
-
 ## BENCHMARKS
 
-| Library                                                   | Type Check | Ops/Sec | Note                                      |
+Telesy is fast enough but type safe.
+
+| Library                                                   | Type Safe | Ops/Sec | Note                                      |
 |-----------------------------------------------------------|------------|---------|-------------------------------------------|
 | **Telesy**                                                | ✅ Safe    | 42,388  | Backed by the native template literals    |
 | [React](https://www.npmjs.com/package/react-dom)          | ✅ Safe    | 4,302   | `ReactDomServer.renderToString()` is slow |
@@ -175,7 +181,7 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 
 Most of Mustache's basic features would just get transformed by `mustache2telesy`,
 except for some use cases such as lambda function calls.
-TypeScript's type checking would help you to fix them easily.
+But don't be afraid. TypeScript's type checking would help you to fix them easily, anyway.
 
 ## LINKS
 

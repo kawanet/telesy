@@ -1,6 +1,6 @@
 {
   "name": "telesy",
-  "description": "Telesy - Simple Type Safe HTML Templating Library using Template Literals",
+  "description": "Telesy - Type Safe HTML Templating Library using Template Literals",
   "version": "1.0.0",
   "author": "@kawanet",
   "bin": {
