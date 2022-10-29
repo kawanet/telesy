@@ -6,7 +6,7 @@
 - We love TypeScript. Telesy allows HTML templates the type checking safety.
 - No compilation build phase needed. Telesy just works on any ES6 compliant [web browsers](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#browser_compatibility) natively.
 - 10 times faster than `ReactDomServer.renderToString()` to generate static HTML code.
-- Lightweight. Less than 1KB when minified.
+- Lightweight. Less than 1KB when minified. No additional dependencies.
 
 ## SYNOPSIS
 
@@ -161,6 +161,18 @@ interface Fragment {
 | [Mustatte](https://www.npmjs.com/package/mustatte)        | ❌ N/A     | 82,726  | Fastest but type gauard **NOT** supported |
 | [Hogan.js](https://www.npmjs.com/package/hogan.js)        | ❌ N/A     | 79,518  | Last publish: 8 years ago                 |
 | [Handlebars.js](https://www.npmjs.com/package/handlebars) | ❌ N/A     | 56,307  | A popular Mustache library                |
+
+## MUSTACHE MIGRATION
+
+If your project has good old [Mustache templates](http://mustache.github.io/),
+use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy.
+
+```sh
+./node_modules/.bin/mustache2telesy templates/*.html > templates.ts
+```
+
+Most features of Mustache would just work on Telesy except for some use cases such as lambda function calls.
+TypeScript's type checking would help you to fix them easily.
 
 ## LINKS
 
