@@ -51,4 +51,46 @@ describe(TITLE, () => {
             assert.equal(normalRender(data), betterRender(data));
         }
     });
+
+    it(`{boolean: "isFoo"}`, () => {
+        const html = `
+        {{# foo.isFoo }}
+        <span>Foo</span>
+        {{/ foo.isFoo }}
+        `;
+        const normalRender = compile(mustache2telesy(html, {trim: true}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, boolean: "isFoo"}));
+        assert.notEqual(String(betterRender), String(normalRender));
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+
+        {
+            const data = {foo: {isFoo: true}};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+    });
+
+    it(`{array: "fooList"}`, () => {
+        const html = `
+        {{# fooList }}
+        <li>{{.}}</li>
+        {{/ fooList }}
+        `;
+        const normalRender = compile(mustache2telesy(html, {trim: true}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, array: "fooList"}));
+        assert.notEqual(String(betterRender), String(normalRender));
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+
+        {
+            const data = {fooList: [1, 2, 3]};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+    });
 });

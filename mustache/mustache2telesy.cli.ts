@@ -24,11 +24,16 @@ function CLI(stream: { write(str: string): any }) {
         console.error(`Usage: ${cmd} --trim --guess templates/*.html > templates.ts`);
     }
 
-    const options: { [key: string]: boolean } = {};
+    const options: { [key: string]: boolean | string } = {};
 
     for (const arg of args) {
-        if (/^--\w+$/.test(arg)) {
-            options[arg.slice(2)] = true;
+        if (/^--\w/.test(arg)) {
+            const eq = arg.slice(2).split("=", 2);
+            if (eq.length === 1) {
+                options[eq[0]] = true;
+            } else {
+                options[eq[0]] = eq[1];
+            }
             continue;
         }
 

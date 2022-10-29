@@ -48,8 +48,24 @@ class Layer {
 
 declare namespace M2T {
     interface Option {
+        array?: string;
+        boolean?: string;
         guess?: boolean;
         trim?: boolean;
+    }
+}
+
+class NameMatch {
+    private index: { [key: string]: boolean };
+
+    constructor(keys: string) {
+        const index: typeof this.index = this.index = {}
+        keys?.split(/\s*,\s*/).forEach(v => index[v] = !!v);
+    }
+
+    match(key: string): boolean {
+        key = key.split(".").at(-1)!;
+        return !!this.index[key];
     }
 }
 
@@ -67,6 +83,9 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
     const regexp = "{{([^{}]*|{[^{}]*})}}";
     const array = String(source).split(new RegExp(regexp));
     const vars: { [name: string]: 1 } = {};
+
+    const boolVars = new NameMatch(option?.boolean!);
+    const arrayVars = new NameMatch(option?.array!);
 
     if (option?.trim) {
         if (/^\s+$/.test(array.at(0)!)) {
@@ -187,7 +206,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         const current = layer.variable(str); // => v.obj?.obj?.key
 
         // Conditional Section
-        const isBoolean = option?.guess && /\.length$/.test(str);
+        const isBoolean = option?.guess && /\.length$/.test(str) || boolVars.match(str);
         if (isBoolean) {
             layer = layer.push(str, "` }", false);
             buffer.push(`\${ !!${current} && \$\$\$\``);
@@ -200,7 +219,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         const child = layer.key;
 
         // Loop Section
-        const isArray = option?.guess && !!vars[`${str}.length`];
+        const isArray = option?.guess && !!vars[`${str}.length`] || arrayVars.match(str);
         if (isArray) {
             buffer.push(`\${ ${current}?.map(${child} => \$\$\$\``);
             return;
