@@ -26,4 +26,29 @@ describe(TITLE, () => {
         assert.notEqual(trimedResult, normalResult);
         assert.equal(removeSpaces(trimedResult), removeSpaces(normalResult));
     });
+
+    it(`{guess: true}`, () => {
+        const html = `
+        {{# array.length }}
+        <ul>
+        {{# array }}
+        <li>{{.}}</li>
+        {{/ array }}
+        </ul>
+        {{/ array.length }}
+        `;
+        const normalRender = compile(mustache2telesy(html, {guess: false, trim: true}));
+        const betterRender = compile(mustache2telesy(html, {guess: true, trim: true}));
+        assert.notEqual(String(betterRender), String(normalRender));
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+
+        {
+            const data = {array: [1, 2, 3]};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+    });
 });

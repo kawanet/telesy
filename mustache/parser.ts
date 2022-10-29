@@ -48,6 +48,7 @@ class Layer {
 
 declare namespace M2T {
     interface Option {
+        guess?: boolean;
         trim?: boolean;
     }
 }
@@ -65,6 +66,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
 
     const regexp = "{{([^{}]*|{[^{}]*})}}";
     const array = String(source).split(new RegExp(regexp));
+    const vars: { [name: string]: 1 } = {};
 
     if (option?.trim) {
         if (/^\s+$/.test(array.at(0)!)) {
@@ -136,6 +138,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ variable }
      */
     function addVariable(str: string): void {
+        vars[str] = 1;
         buffer.push("${" + layer.variable(str) + "}");
     }
 
@@ -153,6 +156,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ $$$(vairable) }
      */
     function ampersandTag(str: string): void {
+        vars[str] = 1;
         buffer.push("${$$$(" + layer.variable(str) + ")}");
     }
 
@@ -174,16 +178,35 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Mustache: {{# array }}...{{/ array }}
      * Telesy:   ${ array.map(a => $$$`...`) } }
      *
-     * Then
+     * On-demand
      * Mustache: {{# v }}...{{/ v }}
      * Telesy:   ${ !!v && (Array.isArray(v) ? v : [v]).map(a => $$$`...`) }
      */
     function sectionTag(str: string): void {
+        vars[str] = 1;
         const current = layer.variable(str); // => v.obj?.obj?.key
+
+        // Conditional Section
+        const isBoolean = option?.guess && /\.length$/.test(str);
+        if (isBoolean) {
+            layer = layer.push(str, "` }", false);
+            buffer.push(`\${ !!${current} && \$\$\$\``);
+            return;
+        }
+
         const force = layer.variable(str, true); // => v.obj.obj.key
         const parent = layer.key;
         layer = layer.push(str, "`) }", true);
         const child = layer.key;
+
+        // Loop Section
+        const isArray = option?.guess && !!vars[`${str}.length`];
+        if (isArray) {
+            buffer.push(`\${ ${current}?.map(${child} => \$\$\$\``);
+            return;
+        }
+
+        // On-demand
         buffer.push(`\${ !!${current} && (Array.isArray(${force}) ? ${force} : [${parent}]).map(${child} => \$\$\$\``);
     }
 
@@ -193,6 +216,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ !boolean && $$$`...` }
      */
     function invertedSectionTag(str: string): void {
+        vars[str] = 1;
         buffer.push(`\${ !${layer.variable(str)} && \$\$\$\``);
         layer = layer.push(str, "` }", false);
     }

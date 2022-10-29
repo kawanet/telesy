@@ -1,6 +1,7 @@
 {
   "include": [
     "benchmark/",
+    "mustache/",
     "src/",
     "tests/",
     "types/"

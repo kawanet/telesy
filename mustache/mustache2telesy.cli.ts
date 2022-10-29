@@ -21,7 +21,7 @@ function CLI(stream: { write(str: string): any }) {
 
     if (!args.length) {
         const cmd = process.argv.at(1)!.split("/").at(-1);
-        console.error(`Usage: ${cmd} mustache-template.html ... > templates.ts`);
+        console.error(`Usage: ${cmd} --trim --guess templates/*.html > templates.ts`);
     }
 
     const options: { [key: string]: boolean } = {};
