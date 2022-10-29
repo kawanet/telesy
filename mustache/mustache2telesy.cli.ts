@@ -17,18 +17,25 @@ function CLI(stream: { write(str: string): any }) {
     const check: { [name: string]: number } = {};
     reservedWords.split(/\W+/).forEach(v => check[v] = 0);
 
-    const files = process.argv.slice(2);
+    const args = process.argv.slice(2);
 
-    if (!files.length) {
+    if (!args.length) {
         const cmd = process.argv.at(1)!.split("/").at(-1);
         console.error(`Usage: ${cmd} mustache-template.html ... > templates.ts`);
     }
 
-    for (const file of files) {
-        let source = fs.readFileSync(file, "utf-8");
+    const options: { [key: string]: boolean } = {};
+
+    for (const arg of args) {
+        if (/^--\w+$/.test(arg)) {
+            options[arg.slice(2)] = true;
+            continue;
+        }
+
+        let source = fs.readFileSync(arg, "utf-8");
         source = source.replace(/^\s+/mg, "").replace(/\s+\n/g, "\n");
 
-        let name = file.split("/").pop()?.split(".").shift()?.replace(/\W/g, "_")!;
+        let name = arg.split("/").pop()?.split(".").shift()?.replace(/\W/g, "_")!;
         if (check[name] == null) {
             check[name] = 1;
         } else {
@@ -39,10 +46,10 @@ function CLI(stream: { write(str: string): any }) {
             check[name] = 0;
         }
 
-        const code = mustache2telesy(source);
+        const code = mustache2telesy(source, options);
 
         // @see https://www.jetbrains.com/help/idea/using-language-injections.html#use-language-injection-comments
-        if (/\.html$/.test(file)) {
+        if (/\.html$/.test(arg)) {
             stream.write(`// language=HTML\n`);
         }
 

@@ -46,7 +46,13 @@ class Layer {
     }
 }
 
-export function mustache2telesy(source: string): string {
+declare namespace M2T {
+    interface Option {
+        trim?: boolean;
+    }
+}
+
+export function mustache2telesy(source: string, option?: M2T.Option): string {
     const TAG_MAP = {
         "&": ampersandTag,
         "/": closeTag,
@@ -59,6 +65,15 @@ export function mustache2telesy(source: string): string {
 
     const regexp = "{{([^{}]*|{[^{}]*})}}";
     const array = String(source).split(new RegExp(regexp));
+
+    if (option?.trim) {
+        if (/^\s+$/.test(array.at(0)!)) {
+            array[0] = "";
+        }
+        if (/^\s+$/.test(array.at(-1)!)) {
+            array[array.length - 1] = "";
+        }
+    }
 
     let layer = new Layer("`");
     const buffer: string[] = ["(" + layer.key + ") => $$`"];
@@ -77,6 +92,11 @@ export function mustache2telesy(source: string): string {
 
     buffer.push(layer.close);
     let result = buffer.join("");
+
+    // $$$` <element> `
+    if (option?.trim) {
+        result = result.replace(/\$\$`\s*(<[^\n`]*>)\s*`/g, "$$$$`$1`");
+    }
 
     // !boolean && $$$`${variable}`
     // !boolean && variable
