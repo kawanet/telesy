@@ -162,11 +162,13 @@ Telesy is fast enough but type safe.
 
 | Library                                                   | Type Safe | Ops/Sec | Note                                      |
 |-----------------------------------------------------------|------------|---------|-------------------------------------------|
-| **Telesy**                                                | ✅ Safe    | 42,388  | Backed by the native template literals    |
-| [React](https://www.npmjs.com/package/react-dom)          | ✅ Safe    | 4,302   | `ReactDomServer.renderToString()` is slow |
-| [Mustatte](https://www.npmjs.com/package/mustatte)        | ❌ N/A     | 82,726  | Fastest but type check **NOT** supported  |
-| [Hogan.js](https://www.npmjs.com/package/hogan.js)        | ❌ N/A     | 79,518  | Last publish: 8 years ago                 |
-| [Handlebars.js](https://www.npmjs.com/package/handlebars) | ❌ N/A     | 56,307  | A popular Mustache library                |
+| **Telesy**                                                | ✅ Safe    | 42,389  | Backed by the native template literals    |
+| [React](https://www.npmjs.com/package/react-dom)          | ✅ Safe    | 4,278   | `ReactDomServer.renderToString()` is slow |
+| [Mustatte](https://www.npmjs.com/package/mustatte)        | ❌ N/A     | 82,442  | Fastest but type safe **NOT** supported   |
+| [Hogan.js](https://www.npmjs.com/package/hogan.js)        | ❌ N/A     | 74,087  | Last publish: 8 years ago                 |
+| [Handlebars.js](https://www.npmjs.com/package/handlebars) | ❌ N/A     | 54,129  | A popular Mustache library                |
+
+The benchmark results above is on node v18.12.0, Apple Silicon M1.
 
 ## MUSTACHE MIGRATION
 
@@ -174,8 +176,10 @@ If your project has good old [Mustache templates](http://mustache.github.io/),
 use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy.
 
 ```sh
+# combine multiple template files to a single TypeScript code
 ./node_modules/.bin/mustache2telesy --trim --guess templates/*.html > templates.ts
 
+# give some hints of property types to get more simple code generated
 ./node_modules/.bin/mustache2telesy --trim --guess --array="items,itemList" --bool="isHidden,selected" --func="getText" templates/*.html > templates.ts
 ```
 
