@@ -10,6 +10,7 @@ import * as Mustatte from "mustatte";
 import {demoData} from "./demo-data";
 import {telesyRender} from "./demo-telesy";
 import {reactRender} from "./demo-react";
+import {commonTagsRender} from "./demo-common-tags";
 
 const source = fs.readFileSync(`${__dirname}/demo-table.html`, "utf-8");
 const mustatteRender = Mustatte.compile(source);
@@ -21,6 +22,7 @@ const removeSpaces = (s: string) => s.replace(/(>)\s+|\s+(<)/g, "$1$2");
 const miniData = demoData(1);
 
 assert.equal(removeSpaces(telesyRender(miniData)), expected, "telesy");
+assert.equal(removeSpaces(commonTagsRender(miniData)), expected, "common-tags");
 assert.equal(removeSpaces(reactRender(miniData)), expected, "react");
 assert.equal(removeSpaces(mustatteRender(miniData)), expected, "mustatte");
 assert.equal(removeSpaces(hoganRender.render(miniData)), expected, "hogan.js");
@@ -30,6 +32,7 @@ const suite = new Benchmark.Suite();
 const moreData = demoData(10);
 
 suite.add("telesy", () => telesyRender(moreData));
+suite.add("common-tags", () => commonTagsRender(moreData));
 suite.add("react", () => reactRender(moreData));
 suite.add("mustatte", () => mustatteRender(moreData));
 suite.add("hogan.js", () => hoganRender.render(moreData));

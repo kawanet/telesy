@@ -1,7 +1,7 @@
 {
   "name": "telesy",
   "description": "Telesy - Type Safe HTML Templating Library using Template Literals",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "@kawanet",
   "bin": {
     "mustache2telesy": "mustache/mustache2telesy.cli.js"
@@ -11,12 +11,14 @@
     "@babel/plugin-transform-template-literals": "7.18.9",
     "@types/babel__core": "7.1.19",
     "@types/benchmark": "2.1.2",
+    "@types/common-tags": "1.8.1",
     "@types/hogan.js": "3.0.1",
     "@types/mocha": "10.0.0",
     "@types/node": "18.11.7",
     "@types/react": "18.0.24",
     "@types/react-dom": "18.0.8",
     "benchmark": "2.1.4",
+    "common-tags": "1.8.2",
     "handlebars": "4.7.7",
     "hogan.js": "3.0.2",
     "mocha": "10.1.0",
@@ -35,6 +37,12 @@
     "types/*.d.ts"
   ],
   "homepage": "https://github.com/kawanet/telesy#readme",
+  "keywords": [
+    "common-tags",
+    "html",
+    "mustache",
+    "template"
+  ],
   "license": "MIT",
   "main": "./src/telesy.js",
   "repository": {
@@ -42,6 +50,7 @@
     "url": "git+https://github.com/kawanet/telesy.git"
   },
   "scripts": {
+    "benchmark": "node benchmark/bench.js",
     "build": "./node_modules/.bin/tsc -p .",
     "fixpack": "fixpack",
     "prepack": "npm run build && npm test",

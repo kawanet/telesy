@@ -42,7 +42,7 @@ JavaScript (ES6)
 const {$$, $$$} = require("telesy");
 
 // language=HTML
-const selectRender = ctx => $$`
+const selectRender = (ctx) => $$`
     <select name="${ctx.name}">
         ${ctx.options.map(v => $$$`<option value="${v.value}" ${v.selected}>${v.label}</option>`)}
     </select>
@@ -163,6 +163,7 @@ Telesy is fast enough but type safe.
 | Library                                                   | Type Safe | Ops/Sec | Note                                      |
 |-----------------------------------------------------------|------------|---------|-------------------------------------------|
 | **Telesy**                                                | ✅ Safe    | 42,389  | Backed by the native template literals    |
+| [common-tags](https://www.npmjs.com/package/common-tags)  | ✅ Safe    | 8,323   | Nested `safeHtml` causes trouble          |
 | [React](https://www.npmjs.com/package/react-dom)          | ✅ Safe    | 4,278   | `ReactDomServer.renderToString()` is slow |
 | [Mustatte](https://www.npmjs.com/package/mustatte)        | ❌ N/A     | 82,442  | Fastest but type safe **NOT** supported   |
 | [Hogan.js](https://www.npmjs.com/package/hogan.js)        | ❌ N/A     | 74,087  | Last publish: 8 years ago                 |
@@ -183,6 +184,9 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 ./node_modules/.bin/mustache2telesy --trim --guess --array="items,itemList" --bool="isHidden,selected" --func="getText" templates/*.html > templates.ts
 ```
 
+The author is a Mustache user for more than 10 years.
+His Mustache-based project was migrated to Telesy/TypeScript just in minutes.
+
 Most of Mustache's basic features would just get transformed by `mustache2telesy`,
 except for some use cases such as lambda function calls.
 But don't be afraid. TypeScript's type checking would help you to fix them easily, anyway.
@@ -190,4 +194,4 @@ But don't be afraid. TypeScript's type checking would help you to fix them easil
 ## LINKS
 
 - https://github.com/kawanet/telesy
-- https://www.npmjs.co/package/telesy
+- https://www.npmjs.com/package/telesy
