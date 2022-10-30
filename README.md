@@ -63,7 +63,7 @@ const render = (ctx) => $$`<p>Hello, ${ctx.name}!</p>`;
 render({name: "Ken"}); // => '<p>Hello, Ken!</p>'
 ```
 
-HTML elements escaped per default:
+HTML special characters escaped per default for safe:
 
 ```js
 const render = (ctx) => $$`<p>${ctx.html}</p>`;
@@ -71,7 +71,7 @@ const render = (ctx) => $$`<p>${ctx.html}</p>`;
 render({html: 'first line<br>second line'}); // => '<p>first line＆lt;br＆gt;second line</p>'
 ```
 
-HTML elements unescaped with `$$$` filter function like `dangerouslySetInnerHTML` does:
+HTML special characters unescaped with `$$$` filter function like `dangerouslySetInnerHTML` does:
 
 ```js
 const render = (ctx) => $$`<p>${$$$(ctx.html)}</p>`;
@@ -168,7 +168,7 @@ Telesy is fast enough but type safe.
 | [Hogan.js](https://www.npmjs.com/package/hogan.js)        | ❌ N/A     | 74,087  | Last publish: 8 years ago                 |
 | [Handlebars.js](https://www.npmjs.com/package/handlebars) | ❌ N/A     | 54,129  | A popular Mustache library                |
 
-The benchmark results above is on node v18.12.0, Apple Silicon M1.
+The benchmark result above is on node v18.12.0, Apple Silicon M1.
 
 ## MUSTACHE MIGRATION
 
@@ -176,7 +176,7 @@ If your project has good old [Mustache templates](http://mustache.github.io/),
 use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy.
 
 ```sh
-# combine multiple template files to a single TypeScript code
+# combine multiple template files to a single TypeScript file
 ./node_modules/.bin/mustache2telesy --trim --guess templates/*.html > templates.ts
 
 # give some hints of property types to get more simple code generated
