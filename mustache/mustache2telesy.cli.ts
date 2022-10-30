@@ -28,6 +28,7 @@ function CLI(stream: { write(str: string): any }) {
 
     const options: { [key: string]: boolean | string } = {};
 
+    // parsing option arguments
     for (const arg of args) {
         if (/^--\w/.test(arg)) {
             const eq = arg.slice(2).split("=", 2);
@@ -36,13 +37,16 @@ function CLI(stream: { write(str: string): any }) {
             } else {
                 options[eq[0]] = eq[1];
             }
-            continue;
         }
+    }
 
+    // read each files
+    for (const arg of args) {
+        if (/^--\w/.test(arg)) continue;
         let source = fs.readFileSync(arg, "utf-8");
         source = source.replace(/^\s+/mg, "").replace(/\s+\n/g, "\n");
 
-        let name = arg.split("/").pop()?.split(".").shift()?.replace(/\W/g, "_")!;
+        let name = arg.split("/").pop()?.replace(/\W/g, "_")!;
         if (check[name] == null) {
             check[name] = 1;
         } else {
