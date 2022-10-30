@@ -86,13 +86,13 @@ class Vars {
      * v.object?.["other-key"]
      * v.array?.[1]
      */
-    name(parent: string, name: string, force?: boolean): string {
+    name(parent: string, name: string, safe?: boolean): string {
         name = trim(name);
         if (name === ".") return parent;
         const isFunc = this.func.match(name);
 
         name = parent + name.split(".").map((v, idx) => {
-            let q = (idx > 0 && !force) ? "?" : "";
+            let q = (idx > 0 && !safe) ? "?" : "";
             if (/^[_a-zA-Z$][\w$]*$/.test(v)) return `${q}.${v}`;
             if (q) q += ".";
             if (/^\d+$/.test(v)) return `${q}[${v}]`;
@@ -253,7 +253,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         /**
          * Conditional Section (boolean)
          * Mustache: {{# boolean }}...{{/ boolean }}
-         * Telesy:   ${ !!v.boolean && $$$`...`} }
+         * Telesy:   ${ !!v.boolean && $$$`...` }
          */
         if (vars.bool.match(str)) {
             layer = layer.push(str, "` }", false);
@@ -261,7 +261,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
             return;
         }
 
-        const force = vars.name(layer.key, str, true); // => v.obj.obj.key
+        const safe = vars.name(layer.key, str, true); // => v.obj.obj.key
         const parent = layer.key;
         layer = layer.push(str, "`) }", true);
         const child = layer.key;
@@ -269,7 +269,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         /**
          * Loop Section
          * Mustache: {{# array }}...{{/ array }}
-         * Telesy:   ${ v.array.map(w => $$$`...`) } }
+         * Telesy:   ${ v.array?.map(w => $$$`...`) }
          */
         if (vars.array.match(str)) {
             buffer.push(`\${ ${current}?.map(${child} => \$\$\$\``);
@@ -279,10 +279,10 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         /**
          * Conditional Section (object)
          * Mustache: {{# object }}...{{/ object }}
-         * Telesy:   ${ !!v.object && [v.object].map(w => $$$`...`) } }
+         * Telesy:   ${ !!v.object && [v.object].map(w => $$$`...`) }
          */
         if (vars.obj.match(str)) {
-            buffer.push(`\${ !!${current} && [${force}].map(${child} => \$\$\$\``);
+            buffer.push(`\${ !!${current} && [${safe}].map(${child} => \$\$\$\``);
             return;
         }
 
@@ -291,7 +291,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
          * Mustache: {{# key }}...{{/ key }}
          * Telesy:   ${ !!v.key && (Array.isArray(v.key) ? v.key : ("object" === typeof v.key) ? [v.key] : [v]).map(w => $$$`...`) }
          */
-        buffer.push(`\${ !!${current} && (Array.isArray(${force}) ? ${force} : ("object" === typeof ${force}) ? [${force}] : [${parent}]).map(${child} => \$\$\$\``);
+        buffer.push(`\${ !!${current} && (Array.isArray(${safe}) ? ${safe} : ("object" === typeof ${safe}) ? [${safe}] : [${parent}]).map(${child} => \$\$\$\``);
     }
 
     /**
