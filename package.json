@@ -7,6 +7,9 @@
     "mustache2telesy": "mustache/mustache2telesy.cli.js"
   },
   "devDependencies": {
+    "@babel/core": "7.19.6",
+    "@babel/plugin-transform-template-literals": "7.18.9",
+    "@types/babel__core": "7.1.19",
     "@types/benchmark": "2.1.2",
     "@types/hogan.js": "3.0.1",
     "@types/mocha": "10.0.0",
