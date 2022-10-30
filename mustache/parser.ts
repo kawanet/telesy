@@ -26,27 +26,72 @@ class Layer {
     isRoot(): boolean {
         return !this.parent;
     }
+}
+
+class TypeVars {
+    private index: { [key: string]: 1 };
+
+    constructor(keys?: string) {
+        const index: typeof this.index = this.index = {};
+        keys?.split(/[,\s]+/).forEach(v => (index[v] = 1));
+    }
+
+    add(key: string): void {
+        this.index[key] = 1;
+    }
+
+    match(key: string): boolean {
+        const s = key.split(".").pop()!;
+        return (this.index[s] === 1) || (this.index[key] === 1);
+    }
+}
+
+class Vars {
+    guess: boolean;
+    array: TypeVars;
+    bool: TypeVars;
+    func: TypeVars;
+    obj: TypeVars;
+
+    constructor(option: M2T.Option) {
+        this.array = new TypeVars(option.array);
+        this.bool = new TypeVars(option.boolean);
+        this.func = new TypeVars(option.func);
+        this.obj = new TypeVars(option.object);
+        this.guess = !!option.guess;
+    }
+
+    register(name: string): void {
+        if (!this.guess) return;
+        name = trim(name);
+        if (name === ".") return;
+
+        if (/\.length$/.test(name)) {
+            this.bool.add(name);
+            name = parentName(name);
+            this.array.add(name)
+        } else if (/\.(toString|valueOf|toJSON)$/.test(name)) {
+            this.func.add(name);
+        }
+
+        while (/\./.test(name)) {
+            name = parentName(name);
+            if (/\.\d+$/.test(name)) break;
+            this.obj.add(name);
+        }
+    }
 
     /**
      * v.object?.key
      * v.object?.["other-key"]
      * v.array?.[1]
      */
-    variable(name: string, force?: boolean): string {
-        return this._variable(this.key, name, !!force);
-    }
-
-    /**
-     * {{> alt.partials.foo }}
-     */
-    alt(name: string): string {
-        return this._variable("alt", name, false);
-    }
-
-    private _variable(parent: string, name: string, force: boolean): string {
+    name(parent: string, name: string, force?: boolean): string {
         name = trim(name);
         if (name === ".") return parent;
-        return parent + name.split(".").map((v, idx) => {
+        const isFunc = this.func.match(name);
+
+        name = parent + name.split(".").map((v, idx) => {
             let q = (idx > 0 && !force) ? "?" : "";
             if (/^[_a-zA-Z$][\w$]*$/.test(v)) return `${q}.${v}`;
             if (q) q += ".";
@@ -54,6 +99,9 @@ class Layer {
             v = v.replace(/(["\\])/g, "\\$1");
             return `${q}["${v}"]`;
         }).join("");
+
+        if (isFunc) name += "()";
+        return name;
     }
 }
 
@@ -61,27 +109,10 @@ declare namespace M2T {
     interface Option {
         array?: string; // {{# array }}...{{/ array }}
         boolean?: string; // {{# boolean }}...{{/ boolean }}
+        func?: string; // {{ function }}
         guess?: boolean;
         object?: string; // {{# object }}...{{/ object }}
         trim?: boolean;
-    }
-}
-
-class Vars {
-    private index: { [key: string]: boolean };
-
-    constructor(keys: string) {
-        const index: typeof this.index = this.index = {}
-        keys?.split(/\s*,\s*/).forEach(v => index[v] = !!v);
-    }
-
-    add(key: string): void {
-        this.index[key] = true;
-    }
-
-    match(key: string): boolean {
-        const s = key.split(".").pop()!;
-        return !!this.index[s] || !!this.index[key];
     }
 }
 
@@ -99,10 +130,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
 
     const regexp = "{{([^{}]*|{[^{}]*})}}";
     const array = String(source).split(new RegExp(regexp));
-
-    const arrayVars = new Vars(option?.array!);
-    const boolVars = new Vars(option?.boolean!);
-    const objVars = new Vars(option?.object!);
+    const vars = new Vars(option || {});
 
     if (option?.trim) {
         if (/^\s+$/.test(array[0])) {
@@ -174,8 +202,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ v.variable }
      */
     function addVariable(str: string): void {
-        registerVar(str);
-        buffer.push("${" + layer.variable(str) + "}");
+        vars.register(str);
+        buffer.push("${" + vars.name(layer.key, str) + "}");
     }
 
     /*
@@ -192,8 +220,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ $$$(v.vairable) }
      */
     function ampersandTag(str: string): void {
-        registerVar(str);
-        buffer.push("${$$$(" + layer.variable(str) + ")}");
+        vars.register(str);
+        buffer.push("${$$$(" + vars.name(layer.key, str) + ")}");
     }
 
     /**
@@ -211,7 +239,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      */
     function partialTag(str: string): void {
         buffer[0] = buffer[0].replace(/^\((\w+)\)/, "($1, alt)");
-        buffer.push("${" + layer.alt(str) + "}");
+        buffer.push("${" + vars.name("alt", str) + "}");
     }
 
     /**
@@ -219,22 +247,21 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Mustache: {{# section }}...{{/ section }}
      */
     function sectionTag(str: string): void {
-        registerVar(str);
-        const current = layer.variable(str); // => v.obj?.obj?.key
+        vars.register(str);
+        const current = vars.name(layer.key, str); // => v.obj?.obj?.key
 
         /**
          * Conditional Section (boolean)
          * Mustache: {{# boolean }}...{{/ boolean }}
          * Telesy:   ${ !!v.boolean && $$$`...`} }
          */
-        const isBoolean = boolVars.match(str);
-        if (isBoolean) {
+        if (vars.bool.match(str)) {
             layer = layer.push(str, "` }", false);
             buffer.push(`\${ !!${current} && \$\$\$\``);
             return;
         }
 
-        const force = layer.variable(str, true); // => v.obj.obj.key
+        const force = vars.name(layer.key, str, true); // => v.obj.obj.key
         const parent = layer.key;
         layer = layer.push(str, "`) }", true);
         const child = layer.key;
@@ -244,8 +271,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
          * Mustache: {{# array }}...{{/ array }}
          * Telesy:   ${ v.array.map(w => $$$`...`) } }
          */
-        const isArray = arrayVars.match(str);
-        if (isArray) {
+        if (vars.array.match(str)) {
             buffer.push(`\${ ${current}?.map(${child} => \$\$\$\``);
             return;
         }
@@ -255,8 +281,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
          * Mustache: {{# object }}...{{/ object }}
          * Telesy:   ${ !!v.object && [v.object].map(w => $$$`...`) } }
          */
-        const isObject = objVars.match(str);
-        if (isObject) {
+        if (vars.obj.match(str)) {
             buffer.push(`\${ !!${current} && [${force}].map(${child} => \$\$\$\``);
             return;
         }
@@ -275,8 +300,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ !v.boolean && $$$`...` }
      */
     function invertedSectionTag(str: string): void {
-        registerVar(str);
-        buffer.push(`\${ !${layer.variable(str)} && \$\$\$\``);
+        vars.register(str);
+        buffer.push(`\${ !${vars.name(layer.key, str)} && \$\$\$\``);
         layer = layer.push(str, "` }", false);
     }
 
@@ -302,25 +327,6 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
     function commentTag(): void {
         // ignore
     }
-
-    function registerVar(name: string): void {
-        if (!option?.guess) return;
-
-        name = trim(name);
-        if (name === ".") return;
-
-        if (/\.length$/.test(name)) {
-            boolVars.add(name);
-            name = name.replace(/\.[^.]+$/, "");
-            arrayVars.add(name)
-        }
-
-        while (/\./.test(name)) {
-            name = name.replace(/\.[^.]+$/, "");
-            if (/\.\d+$/.test(name)) break;
-            objVars.add(name);
-        }
-    }
 }
 
 /**
@@ -329,4 +335,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
 
 function trim(str: string) {
     return str.replace(/^\s+/, "").replace(/\s+$/, "");
+}
+
+function parentName(name: string): string {
+    return name.replace(/\.[^.]+$/, "");
 }

@@ -76,6 +76,26 @@ describe(TITLE, () => {
         }
     });
 
+    it(`{guess: true} (Function)`, () => {
+        const html = `<span>{{ foo.toString }}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true, guess: false}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, guess: true}));
+
+        assert.notEqual(String(betterRender), String(normalRender));
+        assert.ok(!/\.toString\(\)/.test(normalRender), `function not detected without {guess: true}`);
+        assert.ok(/\.toString\(\)/.test(betterRender), `function detected with {guess: true}`);
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), betterRender(data));
+        }
+
+        {
+            const data = {foo: {toString: () => "FOO"}};
+            assert.equal(betterRender(data), `<span>FOO</span>`);
+        }
+    });
+
     it(`{boolean: "isFoo"}`, () => {
         const html = `
         {{# foo.isFoo }}
