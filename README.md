@@ -176,7 +176,7 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 ```sh
 ./node_modules/.bin/mustache2telesy --trim --guess templates/*.html > templates.ts
 
-./node_modules/.bin/mustache2telesy --trim --array="items,itemList" --bool="isHidden,selected" templates/*.html > templates.ts
+./node_modules/.bin/mustache2telesy --trim --guess --array="items,itemList" --bool="isHidden,selected" --func="getText" templates/*.html > templates.ts
 ```
 
 Most of Mustache's basic features would just get transformed by `mustache2telesy`,

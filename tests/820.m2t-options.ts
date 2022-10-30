@@ -137,4 +137,48 @@ describe(TITLE, () => {
             assert.equal(normalRender(data), betterRender(data));
         }
     });
+
+    it(`{object: "bar"}`, () => {
+        const html = `<span>{{# foo.bar }}{{buz}}{{/ foo.bar }}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, object: "bar"}));
+        assert.notEqual(String(betterRender), String(normalRender));
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), `<span></span>`);
+            assert.equal(betterRender(data), `<span></span>`);
+        }
+
+        {
+            const data = {foo: {bar: true}, buz: "YYY"};
+            assert.equal(normalRender(data), `<span>YYY</span>`);
+            assert.equal(betterRender(data), `<span></span>`);
+        }
+
+        {
+            const data = {foo: {bar: {buz: "XXX"}}, buz: "YYY"};
+            assert.equal(normalRender(data), `<span>XXX</span>`);
+            assert.equal(betterRender(data), `<span>XXX</span>`);
+        }
+    });
+
+    it(`{func: "getText"}`, () => {
+        const html = `<span>{{ foo.getText }}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true}));
+        const betterRender = compile(mustache2telesy(html, {trim: true, func: "getText"}));
+        assert.doesNotMatch(String(normalRender), /\.getText\(\)/);
+        assert.match(String(betterRender), /\.getText\(\)/);
+
+        {
+            const data = {};
+            assert.equal(normalRender(data), `<span></span>`);
+            assert.equal(betterRender(data), `<span></span>`);
+        }
+        {
+            const data = {foo: {getText: () => "FOO"}};
+            assert.notEqual(normalRender(data), `<span>FOO</span>`);
+            assert.equal(betterRender(data), `<span>FOO</span>`);
+        }
+    });
 });
