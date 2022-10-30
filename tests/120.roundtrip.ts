@@ -41,4 +41,9 @@ describe(TITLE, () => {
     it(`$$$($$({outerHTML: "..."}))`, () => {
         assert.equal($$$($$({outerHTML: "<foo>"})).outerHTML, "<foo>");
     });
+
+    it('$$$`${string}`.outerHTML === $$`${string}`', () => {
+        const string = "<foo>";
+        assert.equal($$$`${string}`.outerHTML, $$`${string}`);
+    });
 });

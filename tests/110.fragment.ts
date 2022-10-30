@@ -73,4 +73,8 @@ describe(TITLE, () => {
         // @ts-ignore
         equal($$$(["<quux>"]), "<quux>");
     });
+
+    it('$$$("<foo>") === $$$`<foo>`', () => {
+        assert.equal($$$("<foo>").outerHTML, $$$`<foo>`.outerHTML);
+    });
 });

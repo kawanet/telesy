@@ -61,4 +61,9 @@ describe(TITLE, () => {
         // @ts-ignore
         equal($$(["<quux>"]), "&lt;quux&gt;");
     });
+
+    it('$$(string) === $$`${string}`', () => {
+        const string = "<foo>";
+        assert.equal($$(string), $$`${string}`);
+    });
 });
