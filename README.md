@@ -129,8 +129,8 @@ interface Fragment {
 ## EMPTY VALUES
 
 Telesy accepts `string`, `number` values and `Fragment`s within the template literals.
-It outputs empty string `""` when `null`, `undefined` and `false` values given.
-Note that it doesn't accept `true` values, on the other hand.
+It outputs empty string `""` when `null`, `undefined` or `false` value is given.
+Note that it doesn't accept the primitive `true` value, on the other hand.
 Specify strings to output explicitly, instead.
 
 ```js
