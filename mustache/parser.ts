@@ -275,7 +275,7 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         const safe = vars.name(parent, str, true); // => v.obj.obj.key
         layer = layer.push(str, "`) }", true);
 
-        const child = vars.root.match(str) ? rootVar : layer.key;
+        const child = layer.key;
 
         /**
          * Loop Section

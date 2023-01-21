@@ -204,4 +204,18 @@ describe(TITLE, () => {
             assert.equal(optionRender(data), `<span>Foo</span>`);
         }
     });
+
+    it(`{root: "foo", array: "foo"}`, () => {
+        const html = `<span>{{#array}}{{#foo}}{{bar}}{{/foo}}{{/array}}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true, array: "array,foo"}));
+        const optionRender = compile(mustache2telesy(html, {trim: true, array: "array,foo", root: "foo"}));
+        assert.doesNotMatch(String(normalRender), /v\.foo/);
+        assert.match(String(optionRender), /v\.foo/);
+
+        {
+            const data = {array: [{foo: [{bar: "in-array"}]}], foo: [{bar: "on-root"}]};
+            assert.equal(normalRender(data), `<span>in-array</span>`);
+            assert.equal(optionRender(data), `<span>on-root</span>`);
+        }
+    });
 });
