@@ -5,6 +5,10 @@ import {m2tOptions, mustache2telesy} from "./parser";
 
 CLI(process.stdout);
 
+interface Options extends m2tOptions {
+    cjs?: true; // --cjs
+}
+
 function CLI(stream: { write(str: string): any }) {
     // @see https://tc39.es/ecma262/#sec-keywords-and-reserved-words
     const reservedWords = `await break case catch class const continue debugger default delete do
@@ -24,9 +28,7 @@ function CLI(stream: { write(str: string): any }) {
         return;
     }
 
-    stream.write(`import {$$, $$$} from "telesy";\n\n`);
-
-    const options: m2tOptions = {};
+    const options: Options = {};
 
     // parsing option arguments
     for (const arg of args) {
@@ -35,6 +37,8 @@ function CLI(stream: { write(str: string): any }) {
             (options as any)[eq[0]] = (eq.length === 1) ? true : eq[1];
         }
     }
+
+    let count = 0;
 
     // read each files
     for (const arg of args) {
@@ -55,11 +59,25 @@ function CLI(stream: { write(str: string): any }) {
 
         const code = mustache2telesy(source, options);
 
+        if (!count++) {
+            if (options.cjs) {
+                stream.write(`const {$$, $$$} = require("telesy");\n`);
+            } else {
+                stream.write(`import {$$, $$$} from "telesy";\n`);
+            }
+        }
+
+        stream.write(`\n`);
+
         // @see https://www.jetbrains.com/help/idea/using-language-injections.html#use-language-injection-comments
         if (/\.html$/.test(arg)) {
             stream.write(`// language=HTML\n`);
         }
 
-        stream.write(`export const ${name} = ${code};\n\n`);
+        if (options.cjs) {
+            stream.write(`exports.${name} = ${code};\n`);
+        } else {
+            stream.write(`export const ${name} = ${code};\n`);
+        }
     }
 }

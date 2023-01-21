@@ -182,6 +182,9 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 
 # give some hints of property types to get more simple code generated
 ./node_modules/.bin/mustache2telesy --trim --guess --array="items,itemList" --bool="isHidden,selected" --func="getText" templates/*.html > templates.ts
+
+# if you need a plain CommonJS file instead of ES Module or TypeScript file
+./node_modules/.bin/mustache2telesy --trim --guess --cjs templates/*.html > templates.js
 ```
 
 The author is a Mustache user for more than 10 years.
