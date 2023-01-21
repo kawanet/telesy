@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import * as fs from "fs";
-import {mustache2telesy} from "./parser";
+import {m2tOptions, mustache2telesy} from "./parser";
 
 CLI(process.stdout);
 
@@ -26,17 +26,13 @@ function CLI(stream: { write(str: string): any }) {
 
     stream.write(`import {$$, $$$} from "telesy";\n\n`);
 
-    const options: { [key: string]: boolean | string } = {};
+    const options: m2tOptions = {};
 
     // parsing option arguments
     for (const arg of args) {
         if (/^--\w/.test(arg)) {
             const eq = arg.slice(2).split("=", 2);
-            if (eq.length === 1) {
-                options[eq[0]] = true;
-            } else {
-                options[eq[0]] = eq[1];
-            }
+            (options as any)[eq[0]] = (eq.length === 1) ? true : eq[1];
         }
     }
 

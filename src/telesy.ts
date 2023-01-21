@@ -4,8 +4,8 @@
 
 import type {Telesy} from "../";
 
-type Stringify = (v: V) => string;
-type TemplateArgments = [TemplateStringsArray, ...V[]];
+type Stringify = (v: Telesy.V) => string;
+type TemplateArgments = [TemplateStringsArray, ...Telesy.V[]];
 type EscapeFn = (str: string) => string;
 
 const AMP = {"<": "&lt;", "&": "&amp;", ">": "&gt;", '"': "&quot;", "'": "&apos;"};
@@ -14,9 +14,9 @@ const escapeHTML: EscapeFn = v => v.replace(/([<&>"'])/g, ($1: keyof typeof AMP)
 
 const isTemplateStringsArray = (v: any): v is TemplateStringsArray => (v && v.raw && (v.raw.length > 0));
 
-const isFragment = (v: any): v is Fragment => ("string" === typeof v.outerHTML);
+const isFragment = (v: any): v is Telesy.Fragment => ("string" === typeof v.outerHTML);
 
-const toString = function (this: Fragment) {
+const toString = function (this: Telesy.Fragment) {
     return this.outerHTML;
 };
 
@@ -68,7 +68,7 @@ const makeTelesy = (escapeFn: EscapeFn): Telesy.telesy => {
         } else {
             let str = t[0];
             for (let i = 1; i < size; i++) {
-                str += stringify$$(args[i] as V);
+                str += stringify$$(args[i] as Telesy.V);
                 str += t[i];
             }
             return str;

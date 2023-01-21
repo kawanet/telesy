@@ -116,6 +116,8 @@ declare namespace M2T {
     }
 }
 
+export type m2tOptions = M2T.Option;
+
 export function mustache2telesy(source: string, option?: M2T.Option): string {
     const TAG_MAP = {
         "&": ampersandTag,
