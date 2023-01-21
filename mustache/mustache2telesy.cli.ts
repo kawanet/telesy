@@ -7,6 +7,7 @@ CLI(process.stdout);
 
 interface Options extends m2tOptions {
     cjs?: true; // --cjs
+    bool?: string;
 }
 
 function CLI(stream: { write(str: string): any }) {
@@ -37,6 +38,9 @@ function CLI(stream: { write(str: string): any }) {
             (options as any)[eq[0]] = (eq.length === 1) ? true : eq[1];
         }
     }
+
+    // alias
+    options.boolean ||= options.bool;
 
     let count = 0;
 
