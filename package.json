@@ -31,6 +31,7 @@
   "files": [
     "LICENSE",
     "README.md",
+    "esm/*.js",
     "mustache/*.js",
     "src/*.js",
     "types/*.d.ts"
@@ -44,13 +45,14 @@
   ],
   "license": "MIT",
   "main": "./src/telesy.js",
+  "module": "./esm/telesy.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/telesy.git"
   },
   "scripts": {
     "benchmark": "node benchmark/bench.js",
-    "build": "./node_modules/.bin/tsc -p .",
+    "build": "./node_modules/.bin/tsc -p tsconfig.json && ./node_modules/.bin/tsc -p tsconfig-esm.json",
     "fixpack": "fixpack",
     "prepack": "npm run build && npm test",
     "test": "./node_modules/.bin/mocha tests/*.js"
