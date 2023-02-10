@@ -129,8 +129,8 @@ interface Fragment {
 ## EMPTY VALUES
 
 Telesy accepts `string`, `number` values and `Fragment`s within the template literals.
-It outputs empty string `""` when `null`, `undefined` and `false` values given.
-Note that it doesn't accept `true` values, on the other hand.
+It outputs empty string `""` when one of `null`, `undefined` or `false` value is given.
+Note that it doesn't accept the primitive `true` value, on the other hand.
 Specify strings to output explicitly, instead.
 
 ```js
@@ -182,13 +182,16 @@ use the bundled CLI command `mustache2telesy` to migrate from Mustache to Telesy
 
 # give some hints of property types to get more simple code generated
 ./node_modules/.bin/mustache2telesy --trim --guess --array="items,itemList" --bool="isHidden,selected" --func="getText" templates/*.html > templates.ts
+
+# if you need a plain CommonJS file instead of ES Module or TypeScript file
+./node_modules/.bin/mustache2telesy --trim --guess --cjs templates/*.html > templates.js
 ```
 
 The author is a Mustache user for more than 10 years.
 His Mustache-based project was migrated to Telesy/TypeScript just in minutes.
 
-Most of Mustache's basic features would just get transformed by `mustache2telesy`,
-except for some use cases such as lambda function calls.
+Most of Mustache's basic features would just get transformed by `mustache2telesy` CLI.
+You may need to fix the rest by hand.
 But don't be afraid. TypeScript's type checking would help you to fix them easily, anyway.
 
 ## LINKS

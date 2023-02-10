@@ -6,7 +6,9 @@ import {mustache2telesy} from "../mustache/parser";
 
 const TITLE = __filename.split("/").pop()!;
 
-const compile = (source: string) => Function("$$", "$$$", "return " + source)($$, $$$);
+type Render = (context: any, alt?: any) => string;
+
+const compile = (source: string): Render => Function("$$", "$$$", "return " + source)($$, $$$);
 
 describe(TITLE, () => {
     it(`{trim: true}`, () => {
@@ -90,8 +92,8 @@ describe(TITLE, () => {
         const normalRender = compile(mustache2telesy(html, {trim: true, guess: false}));
         const optionRender = compile(mustache2telesy(html, {trim: true, guess: true}));
 
-        assert.ok(!/\.toString\(\)/.test(normalRender), `function not detected without {guess: true}`);
-        assert.ok(/\.toString\(\)/.test(optionRender), `function detected with {guess: true}`);
+        assert.ok(!/\.toString\(\)/.test(String(normalRender)), `function not detected without {guess: true}`);
+        assert.ok(/\.toString\(\)/.test(String(optionRender)), `function detected with {guess: true}`);
 
         {
             const data = {};
@@ -188,6 +190,50 @@ describe(TITLE, () => {
             const data = {foo: {getText: () => "FOO"}};
             assert.notEqual(normalRender(data), `<span>FOO</span>`);
             assert.equal(optionRender(data), `<span>FOO</span>`);
+        }
+    });
+
+    it(`{root: "foo"}`, () => {
+        const html = `<span>{{#array}}{{foo}}{{/array}}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true, array: "array"}));
+        const optionRender = compile(mustache2telesy(html, {trim: true, array: "array", root: "foo"}));
+        assert.doesNotMatch(String(normalRender), /v\.foo/);
+        assert.match(String(optionRender), /v\.foo/);
+
+        {
+            const data = {foo: "Foo", array: [{foo: "Bar"}]};
+            assert.equal(normalRender(data), `<span>Bar</span>`);
+            assert.equal(optionRender(data), `<span>Foo</span>`);
+        }
+    });
+
+    it(`{root: "foo", array: "foo"}`, () => {
+        const html = `<span>{{#array}}{{#foo}}{{bar}}{{/foo}}{{/array}}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true, array: "array,foo"}));
+        const optionRender = compile(mustache2telesy(html, {trim: true, array: "array,foo", root: "foo"}));
+        assert.doesNotMatch(String(normalRender), /v\.foo/);
+        assert.match(String(optionRender), /v\.foo/);
+
+        {
+            const data = {array: [{foo: [{bar: "in-array"}]}], foo: [{bar: "on-root"}]};
+            assert.equal(normalRender(data), `<span>in-array</span>`);
+            assert.equal(optionRender(data), `<span>on-root</span>`);
+        }
+    });
+
+    it(`{alt: "foo"}`, () => {
+        const html = `<span>{{foo}}/{{bar}}</span>`;
+        const normalRender = compile(mustache2telesy(html, {trim: true}));
+        const optionRender = compile(mustache2telesy(html, {trim: true, alt: "foo"}));
+        assert.match(String(normalRender), /v\.foo/);
+        assert.match(String(optionRender), /alt\.foo/);
+
+        {
+            const main = {foo: "main.foo", bar: "main.bar"};
+            const alt = {foo: "alt.foo", bar: "alt.bar"};
+            assert.equal(normalRender(main, alt), `<span>main.foo/main.bar</span>`);
+            // "foo" refers the second (alternative) context. "bar" remains the main context.
+            assert.equal(optionRender(main, alt), `<span>alt.foo/main.bar</span>`);
         }
     });
 });

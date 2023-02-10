@@ -1,5 +1,9 @@
 // parser.ts
 
+const rootContext = "v";
+const altContext = "alt";
+const rootOffset = rootContext.charCodeAt(0) - "a".charCodeAt(0);
+
 class Layer {
     readonly opener: string;
     readonly close: string;
@@ -12,7 +16,7 @@ class Layer {
         this.close = close;
         this.parent = parent!;
         this.count = count = count || 0;
-        this.key = ((count + 21) % 26 + 10).toString(36); // v, w, x, y, z, a, b, c,...
+        this.key = ((count + rootOffset) % 26 + 10).toString(36); // v, w, x, y, z, a, b, c,...
     }
 
     push(name: string, close: string, up: boolean): Layer {
@@ -48,16 +52,20 @@ class TypeVars {
 
 class Vars {
     guess: boolean;
+    alt: TypeVars;
     array: TypeVars;
     bool: TypeVars;
     func: TypeVars;
     obj: TypeVars;
+    root: TypeVars;
 
     constructor(option: M2T.Option) {
         this.array = new TypeVars(option.array);
+        this.alt = new TypeVars(option.alt);
         this.bool = new TypeVars(option.boolean);
         this.func = new TypeVars(option.func);
         this.obj = new TypeVars(option.object);
+        this.root = new TypeVars(option.root);
         this.guess = !!option.guess;
     }
 
@@ -79,6 +87,10 @@ class Vars {
             if (/\.\d+$/.test(name)) break;
             this.obj.add(name);
         }
+    }
+
+    parent(layer: Layer, name: string): string {
+        return this.alt.match(name) ? altContext : this.root.match(name) ? rootContext : layer.key;
     }
 
     /**
@@ -107,14 +119,18 @@ class Vars {
 
 declare namespace M2T {
     interface Option {
+        alt?: string;
         array?: string; // {{# array }}...{{/ array }}
         boolean?: string; // {{# boolean }}...{{/ boolean }}
         func?: string; // {{ function }}
         guess?: boolean;
         object?: string; // {{# object }}...{{/ object }}
+        root?: string;
         trim?: boolean;
     }
 }
+
+export type m2tOptions = M2T.Option;
 
 export function mustache2telesy(source: string, option?: M2T.Option): string {
     const TAG_MAP = {
@@ -142,7 +158,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
     }
 
     let layer = new Layer("`");
-    const buffer: string[] = ["(" + layer.key + ") => $$`"];
+    let hasAlt = !!option?.alt;
+    const buffer: string[] = [];
 
     array.forEach((str, idx) => {
         if (idx & 1) {
@@ -156,6 +173,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
         throw new Error("missing closing tag: " + layer.opener);
     }
 
+    const args = hasAlt ? `${layer.key}, ${altContext}` : layer.key;
+    buffer.unshift("(" + args + ") => $$`");
     buffer.push(layer.close);
     let result = buffer.join("");
 
@@ -203,7 +222,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      */
     function addVariable(str: string): void {
         vars.register(str);
-        buffer.push("${" + vars.name(layer.key, str) + "}");
+        const parent = vars.parent(layer, str);
+        buffer.push("${" + vars.name(parent, str) + "}");
     }
 
     /*
@@ -221,7 +241,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      */
     function ampersandTag(str: string): void {
         vars.register(str);
-        buffer.push("${$$$(" + vars.name(layer.key, str) + ")}");
+        const parent = vars.parent(layer, str);
+        buffer.push("${$$$(" + vars.name(parent, str) + ")}");
     }
 
     /**
@@ -238,8 +259,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      * Telesy:   ${ alt.partial }
      */
     function partialTag(str: string): void {
-        buffer[0] = buffer[0].replace(/^\((\w+)\)/, "($1, alt)");
-        buffer.push("${" + vars.name("alt", str) + "}");
+        hasAlt = true;
+        buffer.push("${" + vars.name(altContext, str) + "}");
     }
 
     /**
@@ -248,7 +269,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      */
     function sectionTag(str: string): void {
         vars.register(str);
-        const current = vars.name(layer.key, str); // => v.obj?.obj?.key
+        const parent = vars.parent(layer, str);
+        const current = vars.name(parent, str); // => v.obj?.obj?.key
 
         /**
          * Conditional Section (boolean)
@@ -261,9 +283,9 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
             return;
         }
 
-        const safe = vars.name(layer.key, str, true); // => v.obj.obj.key
-        const parent = layer.key;
+        const safe = vars.name(parent, str, true); // => v.obj.obj.key
         layer = layer.push(str, "`) }", true);
+
         const child = layer.key;
 
         /**
@@ -301,7 +323,8 @@ export function mustache2telesy(source: string, option?: M2T.Option): string {
      */
     function invertedSectionTag(str: string): void {
         vars.register(str);
-        buffer.push(`\${ !${vars.name(layer.key, str)} && \$\$\$\``);
+        const parent = vars.parent(layer, str);
+        buffer.push(`\${ !${vars.name(parent, str)} && \$\$\$\``);
         layer = layer.push(str, "` }", false);
     }
 

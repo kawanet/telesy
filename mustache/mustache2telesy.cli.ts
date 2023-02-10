@@ -1,9 +1,14 @@
 #!/usr/bin/env node
 
 import * as fs from "fs";
-import {mustache2telesy} from "./parser";
+import {m2tOptions, mustache2telesy} from "./parser";
 
 CLI(process.stdout);
+
+interface Options extends m2tOptions {
+    cjs?: true; // --cjs
+    bool?: string;
+}
 
 function CLI(stream: { write(str: string): any }) {
     // @see https://tc39.es/ecma262/#sec-keywords-and-reserved-words
@@ -24,21 +29,20 @@ function CLI(stream: { write(str: string): any }) {
         return;
     }
 
-    stream.write(`import {$$, $$$} from "telesy";\n\n`);
-
-    const options: { [key: string]: boolean | string } = {};
+    const options: Options = {};
 
     // parsing option arguments
     for (const arg of args) {
         if (/^--\w/.test(arg)) {
             const eq = arg.slice(2).split("=", 2);
-            if (eq.length === 1) {
-                options[eq[0]] = true;
-            } else {
-                options[eq[0]] = eq[1];
-            }
+            (options as any)[eq[0]] = (eq.length === 1) ? true : eq[1];
         }
     }
+
+    // alias
+    options.boolean ||= options.bool;
+
+    let count = 0;
 
     // read each files
     for (const arg of args) {
@@ -59,11 +63,25 @@ function CLI(stream: { write(str: string): any }) {
 
         const code = mustache2telesy(source, options);
 
+        if (!count++) {
+            if (options.cjs) {
+                stream.write(`const {$$, $$$} = require("telesy");\n`);
+            } else {
+                stream.write(`import {$$, $$$} from "telesy";\n`);
+            }
+        }
+
+        stream.write(`\n`);
+
         // @see https://www.jetbrains.com/help/idea/using-language-injections.html#use-language-injection-comments
         if (/\.html$/.test(arg)) {
             stream.write(`// language=HTML\n`);
         }
 
-        stream.write(`export const ${name} = ${code};\n\n`);
+        if (options.cjs) {
+            stream.write(`exports.${name} = ${code};\n`);
+        } else {
+            stream.write(`export const ${name} = ${code};\n`);
+        }
     }
 }
