@@ -1,7 +1,7 @@
 {
   "name": "telesy",
   "description": "Telesy - Type Safe HTML Templating Library using Template Literals",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "@kawanet",
   "bin": {
     "mustache2telesy": "mustache/mustache2telesy.cli.js"
@@ -28,10 +28,14 @@
     "react-dom": "18.2.0",
     "typescript": "4.9.5"
   },
+  "exports": {
+    "require": "./src/telesy.js",
+    "import": "./esm/telesy.mjs"
+  },
   "files": [
     "LICENSE",
     "README.md",
-    "esm/*.js",
+    "esm/*.mjs",
     "mustache/*.js",
     "src/*.js",
     "types/*.d.ts"
@@ -45,17 +49,18 @@
   ],
   "license": "MIT",
   "main": "./src/telesy.js",
-  "module": "./esm/telesy.js",
+  "module": "./esm/telesy.mjs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kawanet/telesy.git"
   },
   "scripts": {
     "benchmark": "node benchmark/bench.js",
-    "build": "./node_modules/.bin/tsc -p tsconfig.json && ./node_modules/.bin/tsc -p tsconfig-esm.json",
+    "build": "./node_modules/.bin/tsc -p tsconfig.json && ./node_modules/.bin/tsc -p tsconfig-esm.json && cp esm/telesy.js esm/telesy.mjs",
     "fixpack": "fixpack",
     "prepack": "npm run build && npm test",
     "test": "./node_modules/.bin/mocha tests/*.js"
   },
+  "type": "commonjs",
   "types": "types/telesy.d.ts"
 }
