@@ -1,36 +1,41 @@
 {
   "name": "telesy",
   "description": "Telesy - Type Safe HTML Templating Library using Template Literals",
-  "version": "1.1.1",
-  "author": "@kawanet",
+  "version": "1.1.2",
+  "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bin": {
     "mustache2telesy": "mustache/mustache2telesy.cli.js"
   },
   "devDependencies": {
-    "@babel/core": "7.20.12",
-    "@babel/plugin-transform-template-literals": "7.18.9",
-    "@types/babel__core": "7.20.0",
+    "@babel/core": "7.22.10",
+    "@babel/plugin-transform-template-literals": "7.22.5",
+    "@types/babel__core": "7.20.1",
     "@types/benchmark": "2.1.2",
     "@types/common-tags": "1.8.1",
     "@types/hogan.js": "3.0.1",
     "@types/mocha": "10.0.1",
     "@types/node": "18.13.0",
-    "@types/react": "18.0.27",
-    "@types/react-dom": "18.0.10",
+    "@types/react": "18.2.20",
+    "@types/react-dom": "18.2.7",
     "benchmark": "2.1.4",
     "common-tags": "1.8.2",
-    "handlebars": "4.7.7",
+    "handlebars": "4.7.8",
     "hogan.js": "3.0.2",
     "mocha": "10.2.0",
     "mustache": "4.2.0",
     "mustatte": "0.1.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.9.5"
+    "typescript": "5.1.6"
   },
   "exports": {
-    "require": "./src/telesy.js",
-    "import": "./esm/telesy.mjs"
+    ".": {
+      "require": "./src/telesy.js",
+      "import": {
+        "default": "./esm/telesy.mjs",
+        "types": "./types/telesy.d.ts"
+      }
+    }
   },
   "files": [
     "LICENSE",
@@ -62,5 +67,5 @@
     "test": "./node_modules/.bin/mocha tests/*.js"
   },
   "type": "commonjs",
-  "types": "types/telesy.d.ts"
+  "types": "./types/telesy.d.ts"
 }
