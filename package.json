@@ -2,7 +2,7 @@
   "name": "telesy",
   "description": "Telesy - Type Safe HTML Templating Library using Template Literals",
   "version": "1.1.2",
-  "author": "@kawanet",
+  "author": "Yusuke Kawasaki <u-suke@kawa.net>",
   "bin": {
     "mustache2telesy": "mustache/mustache2telesy.cli.js"
   },
@@ -29,8 +29,13 @@
     "typescript": "5.1.6"
   },
   "exports": {
-    "require": "./src/telesy.js",
-    "import": "./esm/telesy.mjs"
+    ".": {
+      "require": "./src/telesy.js",
+      "import": {
+        "default": "./esm/telesy.mjs",
+        "types": "./types/telesy.d.ts"
+      }
+    }
   },
   "files": [
     "LICENSE",
@@ -62,5 +67,5 @@
     "test": "./node_modules/.bin/mocha tests/*.js"
   },
   "type": "commonjs",
-  "types": "types/telesy.d.ts"
+  "types": "./types/telesy.d.ts"
 }
